@@ -73,7 +73,13 @@
         ]
     },
     "scripts-descriptions": {
-        "start" : "Run Test Web server"
+        "start" : "Run Test Web server",
+        "stop" : "Stop Test Web server",
+        "fix:cs": "Fix PHP code with PHP CS Fixer",
+        "test:cs" : "Test PHP code with PHP CS Fixer",
+        "test:codeception" : "Nettoie le répertoire « _output » et le code généré par Codeception, initialise la base de données de test et lance les tests de Codeception",
+        "test" : "Teste la mise en forme du code et lance les tests avec Codeception",
+        "db" : "Détruit et recrée la base de données, migre sa structure et regénère les données factices"
     },
     "conflict": {
         "symfony/symfony": "*"
