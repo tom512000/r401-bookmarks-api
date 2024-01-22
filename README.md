@@ -3,6 +3,13 @@
 ## Auteur :
 - Tom SIKORA (siko0001)
 
+## Script :
+- `composer start` : Lance le serveur web de test.
+- `composer test:cs` : Lance la commande de vérification du code par PHP CS Fixer.
+- `composer fix:cs` : Lance la commande de correction du code par PHP CS Fixer.
+- `composer test` : Teste la mise en forme du code.
+- `composer db` : Détruit et recrée la base de données, migre sa structure et regénère les données factices.
+
 ### 1. Mise en place d'API Platform
 - `composer self-update` : Mise à jour de Composer.
 - Mise à jour de Symfony.
@@ -51,3 +58,47 @@
 - `bin/console doctrine:migrations:migrate` : Application de la nouvelle migration.
 - `bin/console dbal:run-sql "SELECT * FROM bookmark"` : Réalisation d'une requête sur la table pour vérifier la bonne création de la table.
 - Obtention du message `[OK] The query yielded an empty result set.`.
+
+### 7. Génération de données
+- `composer require orm-fixtures --dev` : Installation de l'outil de gestion des « fixtures ».
+- `bin/console make:fixtures` : Génération d'un nouveau script de génération de contenu pour la table.
+- `composer require zenstruck/foundry --dev` : Installation de l'outil « Foundry ».
+- `bin/console make:factory` : Création d'une nouvelle forge de données pour l'entité Bookmark.
+- Utilisation de Faker pour initialiser les attributs :
+  - name avec un faux nom de société.
+  - description avec un paragraphe de texte généré.
+  - creationDate avec une date entre maintenant et il y a deux ans.
+  - isPublic avec un booléen.
+  - url avec une fausse url.
+- Remplacement du contenu de la méthode « load » de « BookmarkFixtures » pour générer le jeu de données dans la base de données :
+  ```php
+  <?php
+  
+  namespace App\DataFixtures;
+  
+  use App\Factory\BookmarkFactory;
+  use Doctrine\Bundle\FixturesBundle\Fixture;
+  use Doctrine\Persistence\ObjectManager;
+  
+  class BookmarkFixtures extends Fixture
+  {
+      public function load(ObjectManager $manager)
+      {
+          BookmarkFactory::createMany(20);
+      }
+  }
+  ```
+- Création du script « bd » afin de recréer la base de données avec les commandes :
+  - `php bin/console doctrine:database:drop --force` : Supprime la base de données.
+  - `php bin/console doctrine:database:create` : Crée la base de données.
+  - `php bin/console doctrine:migrations:migrate --no-interaction` : Applique les migrations à la base de données.
+  - `php bin/console doctrine:fixtures:load --no-interaction` : Charge les données de test dans la base de données.
+- `bin/console dbal:run-sql "SELECT COUNT(*) FROM bookmark"` : Vérification du fonctionnement du script « bd ».
+- Obtention du message :
+  ```
+   ---------- 
+    COUNT(*)  
+   ---------- 
+    20        
+   ----------
+  ```
