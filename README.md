@@ -33,3 +33,7 @@
   - « test:cs » qui déclenche la commande `php-cs-fixer fix --dry-run`.
   - « fix:cs » qui déclenche la commande `php-cs-fixer fix`.
   - « test » qui déclenche le script « test:cs » avec la commande `@test:cs`.
+
+### 5. Connexion de la base de données
+- Création d'une nouvelle base de données MySQL (siko0001_Bookmarks).
+- Copie du fichier « .env » en « .env.local » en ajoutant la ligne `DATABASE_URL="mysql://identifiant:mot-de-passe@mysql:3306/nom-de-la-base-de-donnée?serverVersion=mariadb-10.2.25"`.
