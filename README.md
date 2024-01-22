@@ -37,3 +37,17 @@
 ### 5. Connexion de la base de données
 - Création d'une nouvelle base de données MySQL (siko0001_Bookmarks).
 - Copie du fichier « .env » en « .env.local » en ajoutant la ligne `DATABASE_URL="mysql://identifiant:mot-de-passe@mysql:3306/nom-de-la-base-de-donnée?serverVersion=mariadb-10.2.25"`.
+
+### 6. Création d'une table pour les bookmarks
+- `composer require --dev symfony/maker-bundle` : Installation du paquet « PHP maker-bundle » avec Composer.
+- `bin/console make:entity` : Création d'une nouvelle entité « Bookmark » avec les propiétés suivantes.
+  - Nom : name, type : string, taille : 255 et ne pouvant pas être null.
+  - Nom : description, type : text et ne pouvant pas être null.
+  - Nom : creationDate, type : datetime et ne pouvant pas être null.
+  - Nom : isPublic, type : boolean et ne pouvant pas être null.
+  - Nom : url, type : text et ne pouvant pas être null.
+- `bin/console doctrine:schema:update --complete --dump-sql` : Vérification de la validité des instructions SQL.
+- `bin/console make:migration` : Création de la migration de la base de données.
+- `bin/console doctrine:migrations:migrate` : Application de la nouvelle migration.
+- `bin/console dbal:run-sql "SELECT * FROM bookmark"` : Réalisation d'une requête sur la table pour vérifier la bonne création de la table.
+- Obtention du message `[OK] The query yielded an empty result set.`.
