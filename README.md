@@ -25,3 +25,11 @@
 - Ajout de la description de la commande dans le fichier « composer.json ».
 - `composer run --list` : Listage des commandes (scripts).
 - Documentation du projet dans le fichier « README.md ».
+
+### 4. Style de codage
+- `composer require --dev friendsofphp/php-cs-fixer` : Ajout de PHP CS Fixer comme dépendance du projet.
+- Configuration de PHP CS Fixer sur PhpStorm (PHP > Quality Tool > PHP CS Fixer).
+- Ajout de 3 scripts Composer :
+  - « test:cs » qui déclenche la commande `php-cs-fixer fix --dry-run`.
+  - « fix:cs » qui déclenche la commande `php-cs-fixer fix`.
+  - « test » qui déclenche le script « test:cs » avec la commande `@test:cs`.
