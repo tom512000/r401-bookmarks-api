@@ -142,3 +142,51 @@
     67        
    ----------
   ```
+
+### 9. Configuration des opérations API Platform
+- Création d'un nouveau « bookmark » sur la page de l'API (POST /api/bookmarks).
+- `bin/console dbal:run-sql "SELECT COUNT(*) FROM bookmark"` : Listage du nombre de « bookmarks ».
+- Obtention du message :
+  ```
+   ---------- 
+    COUNT(*)  
+   ---------- 
+    68        
+   ----------
+  ```
+- Modification du « bookmark » sur la page de l'API (PATCH /api/bookmarks/{id}).
+- Suppression du « bookmark » sur la page de l'API (DELETE /api/bookmarks/{id}).
+- `bin/console dbal:run-sql "SELECT COUNT(*) FROM bookmark"` : Listage du nombre de « bookmarks ».
+- Obtention du message :
+  ```
+   ---------- 
+    COUNT(*)  
+   ---------- 
+    67        
+   ----------
+  ```
+- Listage des « bookmarks » sur la page de l'API (GET /api/bookmarks).
+- Ajout du tris par ordre alphabétique des noms des « bookmarks » dans le fichier « Bookmark.php » :
+  ```php
+  ...
+  #[ApiResource(order: ['name' => 'ASC'])]
+  ...
+  ```
+- Ajout d'une option de choix de tris (par date de création ou par nom) pour l'utilisateur dans le fichier « Bookmark.php » :
+  ```php
+  ...
+  #[ApiFilter(OrderFilter::class, properties: ['creationDate', 'name'], arguments: ['orderParameterName' => 'order'])]
+  ...
+  ```
+- Ajout d'un filtre permettant de ne sélectionner que les « bookmarks » public dans le fichier « Bookmark.php » :
+  ```php
+  ...
+  #[ApiFilter(BooleanFilter::class, properties: ['isPublic'])]
+  ...
+  ```
+- Ajout d'un attribut permettant de rechercher des « bookmarks » par une partie de leur nom ou de leur description dans le fichier « Bookmark.php » :
+  ```php
+  ...
+  #[ApiFilter(SearchFilter::class, properties: ['name' => 'partial', 'description' => 'partial'])]
+  ...
+  ```

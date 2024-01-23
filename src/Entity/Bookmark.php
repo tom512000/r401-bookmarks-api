@@ -2,13 +2,20 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\BookmarkRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BookmarkRepository::class)]
-#[ApiResource]
+#[ApiResource(order: ['name' => 'ASC'])]
+#[ApiFilter(OrderFilter::class, properties: ['creationDate', 'name'], arguments: ['orderParameterName' => 'order'])]
+#[ApiFilter(BooleanFilter::class, properties: ['isPublic'])]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'partial', 'description' => 'partial'])]
 class Bookmark
 {
     #[ORM\Id]
