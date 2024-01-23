@@ -10,11 +10,15 @@
 - `composer test` : Teste la mise en forme du code.
 - `composer db` : Détruit et recrée la base de données, migre sa structure et regénère les données factices.
 
+<br>
+
 ### 1. Mise en place d'API Platform
 - `composer self-update` : Mise à jour de Composer.
 - Mise à jour de Symfony.
 - `symfony new r401-bookmarks-api --version 6.3` : Création du projet.
 - `composer require api api-platform/core:^3.2` : Installation des composants PHP d'API Platform (sans inclure les fichiers de configuration de Docker).
+
+<br>
 
 ### 2. Gestion du dépôt Git
 - `git add .` : Suivi de tous les fichiers du répertoire par Git.
@@ -23,6 +27,8 @@
 - `git remote add origin https://iut-info.univ-reims.fr/gitlab/siko0001/r401-bookmarks-api.git` : Association du dépôt local au dépôt distant.
 - Ajout de l'intervenant de TP au dépôt distant avec les droits de « reporter ».
 - Ajout de « .idea » dans le fichier « .gitignore ».
+
+<br>
 
 ### 3. Serveur de développement
 - `symfony serve` : Démarrage du serveur local.
@@ -33,6 +39,8 @@
 - `composer run --list` : Listage des commandes (scripts).
 - Documentation du projet dans le fichier « README.md ».
 
+<br>
+
 ### 4. Style de codage
 - `composer require --dev friendsofphp/php-cs-fixer` : Ajout de PHP CS Fixer comme dépendance du projet.
 - Configuration de PHP CS Fixer sur PhpStorm (PHP > Quality Tool > PHP CS Fixer).
@@ -41,9 +49,13 @@
   - « fix:cs » qui déclenche la commande `php-cs-fixer fix`.
   - « test » qui déclenche le script « test:cs » avec la commande `@test:cs`.
 
+<br>
+
 ### 5. Connexion de la base de données
 - Création d'une nouvelle base de données MySQL (siko0001_Bookmarks).
 - Copie du fichier « .env » en « .env.local » en ajoutant la ligne `DATABASE_URL="mysql://identifiant:mot-de-passe@mysql:3306/nom-de-la-base-de-donnée?serverVersion=mariadb-10.2.25"`.
+
+<br>
 
 ### 6. Création d'une table pour les bookmarks
 - `composer require --dev symfony/maker-bundle` : Installation du paquet « PHP maker-bundle » avec Composer.
@@ -58,6 +70,8 @@
 - `bin/console doctrine:migrations:migrate` : Application de la nouvelle migration.
 - `bin/console dbal:run-sql "SELECT * FROM bookmark"` : Réalisation d'une requête sur la table pour vérifier la bonne création de la table.
 - Obtention du message `[OK] The query yielded an empty result set.`.
+
+<br>
 
 ### 7. Génération de données
 - `composer require orm-fixtures --dev` : Installation de l'outil de gestion des « fixtures ».
@@ -93,6 +107,7 @@
   - `php bin/console doctrine:database:create` : Crée la base de données.
   - `php bin/console doctrine:migrations:migrate --no-interaction` : Applique les migrations à la base de données.
   - `php bin/console doctrine:fixtures:load --no-interaction` : Charge les données de test dans la base de données.
+- `composer db` : Réinitialisation de la base de données.
 - `bin/console dbal:run-sql "SELECT COUNT(*) FROM bookmark"` : Vérification du fonctionnement du script « bd ».
 - Obtention du message :
   ```
@@ -100,5 +115,30 @@
     COUNT(*)  
    ---------- 
     20        
+   ----------
+  ```
+
+<br>
+
+### 8. Des données plus réalistes
+- Ajout d'un jeu de données plus réaliste à partir du fichier « bookmark.json ».
+- Modification de la méthode « load » :
+  ```php
+  ...
+  $file = __DIR__.'/data/bookmarks.json';
+  $data = json_decode(file_get_contents($file), true);
+  foreach ($data as $tab) {
+        BookmarkFactory::createOne($tab);
+  }
+  ...
+  ```
+- `composer db` : Réinitialisation de la base de données.
+- `bin/console dbal:run-sql "SELECT COUNT(*) FROM bookmark"` : Vérification du fonctionnement du script « bd ».
+- Obtention du message :
+  ```
+   ---------- 
+    COUNT(*)  
+   ---------- 
+    67        
    ----------
   ```
