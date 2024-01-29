@@ -143,6 +143,8 @@
    ----------
   ```
 
+<br>
+
 ### 9. Configuration des opérations API Platform
 - Création d'un nouveau « bookmark » sur la page de l'API (POST /api/bookmarks).
 - `bin/console dbal:run-sql "SELECT COUNT(*) FROM bookmark"` : Listage du nombre de « bookmarks ».
@@ -190,3 +192,23 @@
   #[ApiFilter(SearchFilter::class, properties: ['name' => 'partial', 'description' => 'partial'])]
   ...
   ```
+
+<br>
+
+### 10. Mise en place de tests
+- Installation de la suite de tests de Codeception ainsi que des modules utiles pour la suite du projet.
+- `php vendor/bin/codecept bootstrap --namespace=App\\Tests --empty` : Initialisation de Codeception.
+- Ajout de la ligne `DATABASE_URL="sqlite:///%kernel.project_dir%/var/test.db"` dans le fichier « .env.test ».
+- Configuration de Codeception pour utiliser les fichiers « .env » et « .env.test » comme sources de paramètres dans « codeception.yml ».
+- `php vendor/bin/codecept generate:suite Api` : Génération de la première suite de tests « Api ».
+- Exclusion du répertoire tests/Support/_generated dans le fichier « .php-cs-fixer.dist.php ».
+- Ajout d'un nouveau script « test:codeception » afin de créer la base de données de test et y ajouter les tables.
+- Ajout d'un appel à ce script Composer dans le script « test », après l'appel au script « test:cs ».
+- Ajout du module « ApiPlatform » dans le répertoire tests/Support/Helper.
+- Ajout du module « EntityManagerReset » dans le répertoire tests/Support/Helper.
+- Modification de la propriété modules du fichier « Api.suite.yml ».
+- Ajout de la classe de Cests « BookmarkGetCest.php » dans le répertoire tests/Api/Bookmark.
+- `composer test` : Exécution des tests de mise en forme et Codeception, test valide avec toutes ses assertions.
+- `composer require --dev --no-interaction symfony/proxy-manager-bridge` : Ajout d'une nouvelle dépendance Composer pour supprimer les notifications de déprecation.
+- Ajout d'un nouveau jeu de tests « BookmarkGetCollectionCest.php » dans le répertoire tests/Api/Bookmark/.
+- `composer test` : Vérification de la validité des tests (OK).

@@ -78,21 +78,30 @@
             "php-cs-fixer fix"
         ],
         "test" : [
-            "@test:cs"
+            "@test:cs",
+            "@test:codeception"
         ],
         "db" : [
             "php bin/console doctrine:database:drop --force",
             "php bin/console doctrine:database:create",
             "php bin/console doctrine:migrations:migrate --no-interaction",
             "php bin/console doctrine:fixtures:load --no-interaction"
+        ],
+        "test:codeception": [
+            "php vendor/bin/codecept clean",
+            "APP_ENV=test php bin/console doctrine:database:drop --force",
+            "APP_ENV=test php bin/console doctrine:database:create",
+            "APP_ENV=test php bin/console doctrine:schema:create --quiet",
+            "php vendor/bin/codecept run --no-artifacts"
         ]
     },
     "scripts-descriptions": {
         "start" : "Run Test Web server",
         "test:cs" : "Test PHP code with PHP CS Fixer",
         "fix:cs": "Fix PHP code with PHP CS Fixer",
-        "test" : "Teste la mise en forme du code",
-        "db" : "Détruit et recrée la base de données, migre sa structure et regénère les données factices"
+        "test" : "Teste la mise en forme du code et lance Codeception",
+        "db" : "Détruit et recrée la base de données, migre sa structure et regénère les données factices",
+        "test:codeception" : "Nettoie le répertoire « _output » et le code généré par Codeception, initialise la base de données de test et lance les tests de Codeception"
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -104,9 +113,15 @@
         }
     },
     "require-dev": {
+        "codeception/codeception": "^5.0",
+        "codeception/module-asserts": "^3.0",
+        "codeception/module-doctrine2": "^3.0",
+        "codeception/module-rest": "^3.3",
+        "codeception/module-symfony": "^3.3",
         "doctrine/doctrine-fixtures-bundle": "^3.5",
         "friendsofphp/php-cs-fixer": "^3.48",
         "symfony/maker-bundle": "^1.52",
+        "symfony/proxy-manager-bridge": "6.3.*",
         "zenstruck/foundry": "^1.36"
     }
 }
