@@ -227,3 +227,32 @@
 - `bin/console doctrine:schema:update --complete --dump-sql` : Contrôle de la validité de la commande SQL produite.
 - `bin/console make:migration` : Mise à jour de la base de données à travers l'utilisation d'une migration.
 - `bin/console doctrine:migrations:migrate` : Exécution de la migration.
+
+<br>
+
+### 2. Génération d'utilisateurs
+- `bin/console make:factory` : Création d'une nouvelle forge « UserFactory ».
+- `composer require jdenticon/jdenticon` : Installation du paquet Composer de la bibliothèque « Jdenticon » afin de générer l'avatar de chaque utilisateur.
+- Ajout de la méthode « createAvatar » dans « UserFactory » afin de générer un avatar de 50 pixels au format PNG à partir du paramètre « value ».
+- Modification de la méthode afin de générer les propriétés suivantes :
+  - login : La chaîne de caractères 'user' suivie d'un nombre unique sur 3 caractères.
+  - roles : Un tableau vide.
+  - password : La chaîne de caractères 'test'.
+  - firstname : Un faux prénom.
+  - lastname : Un faux nom.
+  - avatar : Le résultat de la méthode createAvatar avec en paramètre une combinaison du nom et du prénom.
+- Ajout de la méthode « normalizeName » afin de translittérer et standardisé le nom et le prénom.
+- Modification de la méthode « initialize » pour hacher le mot de passe après l'initialisation d'un utilisateur.
+- `bin/console make:fixtures` : Création d'une nouvelle classe de génération de contenu pour la table « UserFixtures ».
+- Création de 3 utilisateurs 'user1', 'user2', 'user3' et de 20 utilisateurs aléatoires dans « UserFixtures ».
+- `composer db` : Remplissage de la base de données.
+- `bin/console dbal:run-sql "SELECT login, firstname, lastname, email FROM user LIMIT 5"` : Vérification des fixtures.
+- Modification de la localisation de Faker dans « config/packages/zenstruck_foundry.yaml » :
+  ```yaml
+  ...
+  faker:
+      locale: fr_FR
+  ...
+  ```
+- `bin/console dbal:run-sql "SELECT login, firstname, lastname, email FROM user LIMIT 5"` : Vérification des fixtures en français.
+- `bin/console dbal:run-sql "SELECT id, password FROM user"` : Vérification de la génération des mots de passe.
