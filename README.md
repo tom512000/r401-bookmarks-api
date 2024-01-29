@@ -276,3 +276,29 @@
   ...
   ```
 - Vérification du fonctionnement de la redirection (http://127.0.0.1:8000/login).
+
+<br>
+
+### 4. Configuration des opérations API Platform
+- Ajout de l'attribut PHP8 « #[ApiResource] » à la classe « User ».
+- Ajout des 2 actions GET et PATCH à la classe « User ».
+- Création de 2 groupes de sérialisation :
+  - « User_read » pour la normalisation.
+  - « User_write » pour la dénormalisation, pour les actions (PATCH).
+- Ajout des accès aux attributs de lecture GET (id, login, firstname et lastname).
+- Ajout des accès aux attributs de modification PATCH (login, password, firstname, lastname et email).
+- `bin/console cache:clear` : Nettoyage le cache.
+- Ajout des accès à PATCH pour un utilisateur authentifié et dont les modifications ne concernent que ses données.
+- Modification de l'option stateless à false dans la configuration d'API Platform « config/packages/api_platform.yaml ».
+- Surchargement de la méthode « start » de « LoginFormAuthenticator ».
+- Ajout des 2 tests « UserGetCest.php » et « UserPatchCest.php » dans le répertoire tests/Api/User.
+- Ajout d'une configuration spécifique à l'environnement de test dans le fichier « config/services.yaml » :
+  ```yaml
+  when@test:
+    services:
+        # Disable logger to avoid showing errors during tests
+        Psr\Log\NullLogger: ~
+        logger: '@Psr\Log\NullLogger'
+  ```
+- `APP_ENV=test bin/console cache:clear` : Effacement du cache pour l'environnement de test.
+- `composer test` : Lancement des tests (OK).

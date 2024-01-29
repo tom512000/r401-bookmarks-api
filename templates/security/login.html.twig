@@ -8,16 +8,6 @@
 
 {% block body %}
 <form class="login_form" method="post">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
-
-    {% if app.user %}
-        <div class="mb-3">
-            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
-        </div>
-    {% endif %}
-
     <h1 class="h3 mb-3 font-weight-normal">CONNEXION</h1>
 
     <label for="inputLogin">Identifiant</label>
@@ -33,5 +23,16 @@
         <input type="checkbox" name="_remember_me" checked>
         Rester connecté
     </label>
+
+    {% if error %}
+        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+
+    {% if app.user %}
+        <div class="mb-3">
+            Connecté en tant que {{ app.user.userIdentifier }}.
+            <br><a href="{{ path('app_logout') }}">Se déconnecter</a>
+        </div>
+    {% endif %}
 </form>
 {% endblock %}

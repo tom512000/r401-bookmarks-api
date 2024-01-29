@@ -33,6 +33,34 @@ form.login_form > label {
 }
 
 form.login_form > button {
+    margin-top: 12px;
+    font-family: 'Lexend', sans-serif;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: #000;
+    cursor: pointer;
+    border: 3px solid;
+    padding: 0.25em 0.5em;
+    box-shadow: 1px 1px 0 0, 2px 2px 0 0, 3px 3px 0 0, 4px 4px 0 0, 5px 5px 0 0;
+    position: relative;
+}
+
+form.login_form > button:active {
+    box-shadow: 0 0 0 0;
+    top: 5px;
+    left: 5px;
+}
+
+div.mb-3 {
     margin-top: 20px;
     font-family: 'Lexend', sans-serif;
+}
+
+div.mb-3 > a {
+    text-decoration: none;
+    color: #cf4038;
+}
+
+div.mb-3 > a:hover {
+    text-decoration: #cf4038 wavy underline;
 }
