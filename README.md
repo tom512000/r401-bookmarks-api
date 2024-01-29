@@ -12,6 +12,7 @@
 
 <br>
 
+## TP1 - Introduction à API Platform
 ### 1. Mise en place d'API Platform
 - `composer self-update` : Mise à jour de Composer.
 - Mise à jour de Symfony.
@@ -212,3 +213,17 @@
 - `composer require --dev --no-interaction symfony/proxy-manager-bridge` : Ajout d'une nouvelle dépendance Composer pour supprimer les notifications de déprecation.
 - Ajout d'un nouveau jeu de tests « BookmarkGetCollectionCest.php » dans le répertoire tests/Api/Bookmark/.
 - `composer test` : Vérification de la validité des tests (OK).
+
+<br>
+
+## TP2 - Gestion des utilisateurs
+### 1. Création de la table User
+- `bin/console make:user` : Création de l'entité « User », stockée dans la base de données et utilisant la propriété d'identification « login » pour l'authentification.
+- `bin/console make:entity User` : Génération des propiétés suivantes pour l'entité « User ».
+  - Nom : firstname, type : string, taille : 30 et ne pouvant pas être null.
+  - Nom : lastname, type : string, taille : 40 et ne pouvant pas être null.
+  - Nom : avatar, type : blob et ne pouvant pas être null.
+  - Nom : email, type : string, taille : 100 et ne pouvant pas être null.
+- `bin/console doctrine:schema:update --complete --dump-sql` : Contrôle de la validité de la commande SQL produite.
+- `bin/console make:migration` : Mise à jour de la base de données à travers l'utilisation d'une migration.
+- `bin/console doctrine:migrations:migrate` : Exécution de la migration.
