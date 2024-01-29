@@ -256,3 +256,23 @@
   ```
 - `bin/console dbal:run-sql "SELECT login, firstname, lastname, email FROM user LIMIT 5"` : Vérification des fixtures en français.
 - `bin/console dbal:run-sql "SELECT id, password FROM user"` : Vérification de la génération des mots de passe.
+
+<br>
+
+### 3. Mise en place de l'authentification
+- `bin/console make:auth` : Mise en place de l'authentification.
+- Création d'un authentificateur reposant sur un « Login form authenticator » nommé « LoginFormAuthenticator ». Le contrôleur se nommera « SecurityController » et utilisera une route pour que les utilisateurs se déconnectent. L'application pourra également se souvenir des utilisateurs en cochant la case « Rester connecté » à la connexion.
+- Gestion de l'option « Rester connecté » :
+  - Mise en commentaire de l'option « always_remember_me » du fichier « config/packages/security.yaml ». 
+  - Ajout d'une case à cocher dans le formulaire d'authentification.
+- Création de la feuille de style « public/css/login.css ».
+- Insertion de cette feuille dans le twig « security/login.html.twig ».
+- Mise à jour du texte du bouton de soumission pour les tests.
+- Vérification du fonctionnement de la page de connexion (http://127.0.0.1:8000/login).
+- Modification de la méthode « onAuthenticationSuccess » dans la classe « App\Security\LoginFormAuthenticator » afin de gérer la redirection.
+  ```php
+  ...
+  return new RedirectResponse($this->urlGenerator->generate('api_doc'));
+  ...
+  ```
+- Vérification du fonctionnement de la redirection (http://127.0.0.1:8000/login).
