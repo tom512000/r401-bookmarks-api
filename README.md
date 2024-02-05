@@ -302,3 +302,13 @@
   ```
 - `APP_ENV=test bin/console cache:clear` : Effacement du cache pour l'environnement de test.
 - `composer test` : Lancement des tests (OK).
+
+### 5. Modification des données lors de la dénormalisation
+- Création de la classe « UserDenormalizer.php » à l'aide de l'assistant PhpStorm avec :
+  - Une constante « ALREADY_CALLED » avec comme valeur 'USER_DENORMALIZER_ALREADY_CALLED'.
+  - Une propriété « passwordHasher » initialisée dans le constructeur avec le service « UserPasswordHasherInterface ».
+  - Une propriété « security » initialisée dans le constructeur avec le service « Security ».
+  - Une méthode « supportsDenormalization » qui retourne un booléen indiquant si la classe doit transformer les données.
+  - Une méthode « denormalize() » qui doit réaliser la transformation avec les mêmes informations.
+- Ajout du test « UserPatchPasswordCest.php » dans le répertoire tests/Api/User.
+- `composer test` : Lancement des tests (OK).
