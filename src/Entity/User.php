@@ -6,16 +6,47 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
 use App\Repository\UserRepository;
+use App\State\MeProvider;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource(normalizationContext: ['groups' => ['User_read']])]
-#[Get]
-#[Patch(denormalizationContext: ['groups' => ['User_write']],
-    security: "is_granted('ROLE_USER') and object == user")]
+#[ApiResource(
+    operations: [
+        new Get(
+            uriTemplate: '/me',
+            openapiContext: [
+                'summary' => 'Retrieves the connected user',
+                'description' => 'Retrieves the connected user',
+                'responses' => [
+                    '200' => [
+                        'description' => 'connected user resource',
+                        'content' => [
+                            'application/ld+json' => [
+                                'schema' => [
+                                    '$ref' => '#/components/schemas/User.jsonld-User_me_User_read',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            normalizationContext: ['groups' => ['User_me', 'User_read']],
+            security: "is_granted('ROLE_USER')",
+            provider: MeProvider::class
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['User_read']]
+        ),
+        new Patch(
+            normalizationContext: ['groups' => ['User_me', 'User_read']],
+            denormalizationContext: ['groups' => ['User_write']],
+            security: "is_granted('ROLE_USER') and object == user"
+        ),
+    ],
+)]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -50,7 +81,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::BLOB)]
     private $avatar;
 
-    #[Groups('User_write')]
+    #[Groups(['User_write', 'User_me'])]
     #[ORM\Column(length: 100)]
     private ?string $email = null;
 

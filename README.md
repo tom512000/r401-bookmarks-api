@@ -291,6 +291,15 @@
 - Ajout des accès à PATCH pour un utilisateur authentifié et dont les modifications ne concernent que ses données.
 - Modification de l'option stateless à false dans la configuration d'API Platform « config/packages/api_platform.yaml ».
 - Surchargement de la méthode « start » de « LoginFormAuthenticator ».
+- Création d'un nouveau groupe de sérialisation appellé « User_me » et ayant comme unique attribut « email » :
+  ```php
+  ...
+  normalizationContext: ['groups' => ['User_me', 'User_read']],
+  ...
+  #[Groups(['User_write', 'User_me'])]
+  private ?string $email = null;
+  ...
+  ```
 - Ajout des 2 tests « UserGetCest.php » et « UserPatchCest.php » dans le répertoire tests/Api/User.
 - Ajout d'une configuration spécifique à l'environnement de test dans le fichier « config/services.yaml » :
   ```yaml
@@ -303,6 +312,8 @@
 - `APP_ENV=test bin/console cache:clear` : Effacement du cache pour l'environnement de test.
 - `composer test` : Lancement des tests (OK).
 
+<br>
+
 ### 5. Modification des données lors de la dénormalisation
 - Création de la classe « UserDenormalizer.php » à l'aide de l'assistant PhpStorm avec :
   - Une constante « ALREADY_CALLED » avec comme valeur 'USER_DENORMALIZER_ALREADY_CALLED'.
@@ -312,3 +323,72 @@
   - Une méthode « denormalize() » qui doit réaliser la transformation avec les mêmes informations.
 - Ajout du test « UserPatchPasswordCest.php » dans le répertoire tests/Api/User.
 - `composer test` : Lancement des tests (OK).
+
+<br>
+
+### 6. Ajout d'une route personnalisée vers l'utilisateur connecté
+- `bin/console make:state-provider MeProvider` : Génération d'une nouvelle source de données appelée « MeProvider ».
+- Ajout d'une instance de Symfony\Bundle\SecurityBundle\Security dans le constructeur afin d'initialiser la propriété « $security » :
+  ```php
+  ...
+  private Security $security;
+
+  public function __construct(Security $security)
+  {
+      $this->security = $security;
+  }
+  ...
+  ```
+- Utilisation de la méthode « getUser() » de Security pour obtenir l'utilisateur courant dans la méthode provide :
+  ```php
+  ...
+  public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+  {
+      return $this->security->getUser() ?? null;
+  }
+  ...
+  ```
+- Ajout d'une nouvelle action personnalisée dans l'entité « User » :
+  ```php
+  new Get(
+      uriTemplate: '/me',
+      openapiContext: [
+          'summary' => 'Retrieves the connected user',
+          'description' => 'Retrieves the connected user',
+      ],
+      provider: MeProvider::class,
+  ),
+  ```
+- Ajout d'une action afin que l'utilisateur ne puisse accéder à une ressource que s'il est authentifié :
+  ```php
+  ...
+  security: "is_granted('ROLE_USER')",
+  ...
+  ```
+- Utilisation du groupe de sérialisation « User_me » pour identifier les attributs accessibles à l'utilisateur connecté.
+- Ajout du test « UserGetMeCest.php » dans le répertoire tests/Api/User.
+- `composer test` : Lancement des tests (1 erreur : 401 - Authentication).
+- Modification de l'accès aux ressources à l'aide de la propriété « access_control » de la configuration globale de la sécurité dans le fichier « security.yaml » :
+  ```yaml
+  access_control:
+      - {path: ^/api$, roles: PUBLIC_ACCESS}
+      - {path: ^/api/bookmarks, roles: PUBLIC_ACCESS}
+      - {path: ^/api/users/\d+$, roles: PUBLIC_ACCESS}
+      - {path: ^/api/*, roles: IS_AUTHENTICATED_FULLY}
+  ```
+- `composer test` : Lancement des tests (OK).
+- Redéfinissage du contenu de la réponse HTTP 200 en faisant référence au schéma généré à l'aide des groupes de sérialisation :
+  ```php
+  'responses' => [
+     '200' => [
+        'description' => 'connected user resource',
+        'content' => [
+            'application/ld+json' => [
+                'schema' => [
+                    '$ref' => '#/components/schemas/User.jsonld-User_me_User_read',
+                ],
+            ],
+        ],
+     ],
+  ],
+  ```

@@ -15,6 +15,7 @@ class UserPatchPasswordCest
             'login' => 'string',
             'firstname' => 'string',
             'lastname' => 'string',
+            'email' => 'string:email',
         ];
     }
 
