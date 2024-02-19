@@ -436,3 +436,95 @@
       ],
   ],
   ```
+
+<br>
+
+### 8. Validation des données
+- `php vendor/bin/codecept generate:cest Api User\\UserPatchDataValidationCest` : Création de notre premier jeu de tests permettant de valider le contrôle des données.
+- Création de la méthode de classe « expectedProperties » qui retourne un tableau associatif avec comme clés les attributs de normalisation de PATCH et leur type comme valeur associée :
+  ```php
+  protected static function expectedProperties(): array
+  {
+      return [
+          'id' => 'integer',
+          'login' => 'string',
+          'firstname' => 'string',
+          'lastname' => 'string',
+          'email' => 'string:email',
+      ];
+  }
+  ```
+- Création de la méthode de test « loginUnicityTest » qui réalise le test de validation de l'unicité du login :
+  ```php
+  public function loginUnicityTest(ApiTester $I): void
+  {
+      // 1. 'Arrange'
+      $dataAuth = [
+          'login' => 'authenticated',
+          'password' => 'password',
+      ];
+      /** @var $userAuth User */
+      $userAuth = UserFactory::createOne()->object();
+      UserFactory::createOne($dataAuth);
+      $I->amLoggedInAs($userAuth);
+
+      $dataLog = [
+          'login' => 'login',
+          'password' => 'password',
+      ];
+      /** @var $userLog User */
+      $userLog = UserFactory::createOne()->object();
+      UserFactory::createOne($dataLog);
+
+      // 2. 'Act'
+      $dataPatch = [
+          'login' => 'login',
+      ];
+      $I->sendPatch('/api/users/1', $dataPatch);
+
+      // 3. 'Assert'
+      $I->seeResponseCodeIs(422);
+  }
+  ```
+- Ajout d'une contrainte d'unicité sur le login des instances de User à l'aide de la contraintes « UniqueEntity » :
+  ```php
+  #[UniqueEntity('login')]
+  ```
+- Ajout de la methode de test de vérification avec son fournisseur de données associé dans la classe « UserPatchDataValidationCest ».
+- Ajout d'un contrôle sur la propriété email :
+  ```php
+  #[Assert\Email(
+      message: 'The email {{ value }} is not a valid email.',
+  )]
+  ```
+- Interdiction à l'aide d'une expression rationnelle des caractères « < », « > », « & » et « " » pour les propriétés login, firstname et lastname :
+  ```php
+  #[Assert\Regex(
+      pattern: '/^[^<>&"]*$/',
+      message: 'Le login ne peut pas contenir les caractères "<", ">", "&" et ""."'
+  )]
+  protected ?string $login = null;
+  ...
+  #[Assert\Regex(
+      pattern: '/^[^<>&"]*$/',
+      message: 'Le prénom ne peut pas contenir les caractères "<", ">", "&" et ""."'
+  )]
+  protected ?string $firstname = null;
+  ...
+  #[Assert\Regex(
+      pattern: '/^[^<>&"]*$/',
+      message: 'Le nom de famille ne peut pas contenir les caractères "<", ">", "&" et ""."'
+  )]
+  protected ?string $lastname = null;
+  ```
+- Surcharge des exemples en utilisant le paramètre « example » de l'attribut PHP « #[ApiProperty] » des propriétés login, firstname et lastname dans l'entité « User » :
+  ```php
+  #[ApiProperty(example: 'user4')]
+  protected ?string $login = null;
+  ...
+  #[ApiProperty(example: 'Tom')]
+  protected ?string $firstname = null;
+  ...
+  #[ApiProperty(example: 'Sikora')]
+  protected ?string $lastname = null;
+  ```

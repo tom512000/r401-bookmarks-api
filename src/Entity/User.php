@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
@@ -10,9 +11,11 @@ use App\Repository\UserRepository;
 use App\State\MeProvider;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
@@ -34,8 +37,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     ],
                 ],
             ],
-            normalizationContext: [
-                'groups' => ['User_me', 'User_read']],
+            normalizationContext: ['groups' => ['User_me', 'User_read']],
             security: "is_granted('ROLE_USER')",
             provider: MeProvider::class
         ),
@@ -75,6 +77,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity('login')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[Groups('User_read')]
@@ -85,7 +88,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(['User_read', 'User_write'])]
     #[ORM\Column(length: 180, unique: true)]
-    private ?string $login = null;
+    #[Assert\Regex(
+        pattern: '/^[^<>&"]*$/',
+        message: 'Le login ne peut pas contenir les caractères "<", ">", "&" et ""."'
+    )]
+    #[ApiProperty(example: 'user4')]
+    protected ?string $login = null;
 
     #[ORM\Column]
     private array $roles = [];
@@ -99,18 +107,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(['User_read', 'User_write'])]
     #[ORM\Column(length: 30)]
-    private ?string $firstname = null;
+    #[Assert\Regex(
+        pattern: '/^[^<>&"]*$/',
+        message: 'Le prénom ne peut pas contenir les caractères "<", ">", "&" et ""."'
+    )]
+    #[ApiProperty(example: 'Tom')]
+    protected ?string $firstname = null;
 
     #[Groups(['User_read', 'User_write'])]
     #[ORM\Column(length: 40)]
-    private ?string $lastname = null;
+    #[Assert\Regex(
+        pattern: '/^[^<>&"]*$/',
+        message: 'Le nom de famille ne peut pas contenir les caractères "<", ">", "&" et ""."'
+    )]
+    #[ApiProperty(example: 'Sikora')]
+    protected ?string $lastname = null;
 
     #[ORM\Column(type: Types::BLOB)]
     private $avatar;
 
     #[Groups(['User_write', 'User_me'])]
     #[ORM\Column(length: 100)]
-    private ?string $email = null;
+    #[Assert\Email(
+        message: 'The email {{ value }} is not a valid email.',
+    )]
+    protected ?string $email = null;
 
     public function getId(): ?int
     {
