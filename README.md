@@ -392,3 +392,47 @@
      ],
   ],
   ```
+
+<br>
+
+### 7. Ajout d'une route personnalisée vers l'avatar d'un utilisateur
+- Ajout du test « UserGetAvatarCest.php » dans le répertoire tests/Api/User.
+- `bin/console make:controller --no-template GetAvatarController` : Génération d'un nouveau contrôleur appelé « GetAvatarController », sans template twig associé.
+- Création d'une méthode d'instance publique __invoke qui :
+  - Retourne une instance de « Symfony\Component\HttpFoundation\Response ».
+  - Modifie l'en-tête Content-Type de cette réponse pour qu'il soit égal à image/png.
+  - Possède le contenu de la réponse avec l'avatar de l'utilisateur reçu en paramètre.
+- Création d'une opération Get dans le tableau operations de l'attribut « #[ApiResource] » de l'entité User associée à la ressource « /users/{id}/avatar » et au contrôleur « GetAvatarController » :
+  ```php
+  new Get(
+    uriTemplate: '/users/{id}/avatar',
+    formats: [
+        'png' => 'image/png',
+    ],
+    controller: GetAvatarController::class,
+  ),
+  ```
+- Ajout d'une nouvelle règle d'accès à la ressource « /users/{id}/avatar » dans le fichier « security.yaml » :
+  ```yaml
+  access_control:
+      - {path: ^/api/users/\d+/avatar$, roles: PUBLIC_ACCESS}
+  ```
+- Surcharge de la documentation OpenAPI de l'opération en définissant le paramètre openapiContext :
+  ```php
+  'responses' => [
+      '200' => [
+          'description' => 'The user avatar',
+          'content' => [
+              'image/png' => [
+                  'schema' => [
+                      'type' => 'string',
+                      'format' => 'binary',
+                  ],
+              ],
+          ],
+      ],
+      '404' => [
+          'description' => 'User does not exist',
+      ],
+  ],
+  ```

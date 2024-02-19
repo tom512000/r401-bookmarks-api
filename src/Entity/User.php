@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
+use App\Controller\GetAvatarController;
 use App\Repository\UserRepository;
 use App\State\MeProvider;
 use Doctrine\DBAL\Types\Types;
@@ -33,7 +34,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     ],
                 ],
             ],
-            normalizationContext: ['groups' => ['User_me', 'User_read']],
+            normalizationContext: [
+                'groups' => ['User_me', 'User_read']],
             security: "is_granted('ROLE_USER')",
             provider: MeProvider::class
         ),
@@ -44,6 +46,31 @@ use Symfony\Component\Serializer\Annotation\Groups;
             normalizationContext: ['groups' => ['User_me', 'User_read']],
             denormalizationContext: ['groups' => ['User_write']],
             security: "is_granted('ROLE_USER') and object == user"
+        ),
+        new Get(
+            uriTemplate: '/users/{id}/avatar',
+            formats: [
+                'png' => 'image/png',
+            ],
+            controller: GetAvatarController::class,
+            openapiContext: [
+                'responses' => [
+                    '200' => [
+                        'description' => 'The user avatar',
+                        'content' => [
+                            'image/png' => [
+                                'schema' => [
+                                    'type' => 'string',
+                                    'format' => 'binary',
+                                ],
+                            ],
+                        ],
+                    ],
+                    '404' => [
+                        'description' => 'User does not exist',
+                    ],
+                ],
+            ],
         ),
     ],
 )]
